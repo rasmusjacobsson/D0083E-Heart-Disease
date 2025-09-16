@@ -12,25 +12,31 @@ def setup():
 
     return X, Y
 
-# Function to calculate R-squared values
 def R_calc(X, Y):
 
     coeffs = np.polyfit(X, Y, 1)
 
     p = np.poly1d(coeffs)
-    yhat = p(X)                         # or [p(z) for z in x]
-    ybar = np.sum(Y)/len(Y)          # or sum(y)/len(y)
-    ssreg = np.sum((yhat - ybar)**2)   # or sum([ (yihat - ybar)**2 for yihat in yhat])
-    sstot = np.sum((Y - ybar)**2)     # or sum([ (yi - ybar)**2 for yi in y])
+    yhat = p(X)                         
+    ybar = np.sum(Y)/len(Y)          
+    ssreg = np.sum((yhat - ybar)**2)  
+    sstot = np.sum((Y - ybar)**2)     
     r2 = ssreg / sstot
 
     return r2
 
-def impute_missing(X):
+def impute_mean(X):
     for column in X.columns:
         if X[column].isnull().any():
             mean_value = X[column].mean()
             X[column] = X[column].fillna(mean_value)    
+    return X
+
+def impute_median(X):
+    for column in X.columns:
+        if X[column].isnull().any():
+            median_value = X[column].median()
+            X[column] = X[column].fillna(median_value)    
     return X
 
 def feature_correlation(X):
@@ -57,14 +63,9 @@ def feature_correlation(X):
         plt.ylabel(j)
         plt.title(f'{i} vs {j} (R²={r2_value:.2f})')
         plt.legend()
-    plt.show()
+    plt.show(block=False)
 
-
-def main():
-    X, Y = setup()
-    X = impute_missing(X)
-    Y = impute_missing(Y)
-
+def feature_target_correlation(X, Y):
     r2 = {}
     for i in X.columns:
         r2[i] = R_calc(X[i], Y["num"])
@@ -85,15 +86,19 @@ def main():
         plt.ylabel('num')
         plt.title(f'{feature} vs num (R²={r2[feature]:.2f})')
         plt.legend()
-    plt.show()
+    plt.show(block=False)
 
+def main():
+    X, Y = setup()
+    X = impute_mean(X)
+    Y = impute_mean(Y)
+
+    feature_target_correlation(X, Y)
     feature_correlation(X)
 
+    plt.show()
+    
 
 if __name__ == "__main__":
     main()
-
-
-
-
 
