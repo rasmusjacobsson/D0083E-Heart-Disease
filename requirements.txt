@@ -2,3 +2,4 @@ ucimlrepo
 matplotlib
 scipy
 seaborn
+scikit-learn

@@ -4,6 +4,8 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from scipy import stats
 
+from PCA import run_pca, plot_scree, plot_explained_variance, plot_biplot, plot_3D_scores, k_components, plot_loadings, pca_reconstruction
+
 winsorLower = 2
 winsorUpper = 98
 
@@ -136,9 +138,23 @@ def main():
     x_imputed_median = impute_median(x_raw.copy())
     x_cleaned = outlier_removal(x_imputed_median.copy())
 
-    plot_correlation_heatmap(x_raw)
-    plt.show(block=False)
-    plot_correlation_heatmap(x_cleaned)
+    coeffs, score, latent, tsquared, explained, mu, std = run_pca(x_cleaned, n_components=None).values()
+    
+    feature_names = x_cleaned.columns.tolist()
+    k_threshold, k_kaiser = k_components(explained)
+    print(f"Number of components to reach {95}% variance: {k_threshold}")
+    print(f"Number of components according to Kaiser criterion: {k_kaiser}")
+
+    x_reconstructed, rmse = pca_reconstruction(x_cleaned.values, score, coeffs, mu, std, n_components=k_threshold)
+    print(f"Reconstruction RMSE with {k_threshold} components: {rmse:.4f}")
+    # Plot original vs reconstructed for the first feature
+    plt.figure(figsize=(8, 6))
+    plt.plot(x_cleaned.iloc[:, 0], label='Original', alpha=0.7)
+    plt.plot(x_reconstructed[:, 0], label='Reconstructed', alpha=0.7)
+    plt.title('Original vs Reconstructed (First Feature)')
+    plt.xlabel('Sample Index')
+    plt.ylabel('Feature Value')
+    plt.legend()
     plt.show()
 
 if __name__ == "__main__":
