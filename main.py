@@ -5,6 +5,7 @@ import seaborn as sns
 from scipy import stats
 
 from PCA import run_pca, plot_scree, plot_explained_variance, plot_biplot, plot_3D_scores, k_components, plot_loadings, pca_reconstruction
+from classification import standardize_data, split_data, train_model, evaluate_model, calculate_f1_score, confusion_matrix, print_model_details
 
 winsorLower = 2
 winsorUpper = 98
@@ -138,6 +139,80 @@ def main():
     x_imputed_median = impute_median(x_raw.copy())
     x_cleaned = outlier_removal(x_imputed_median.copy())
 
+    # Standardize the data
+    x_cleaned, mean, std = standardize_data(x_cleaned)  
+
+    # split the data
+    x_train, x_test, x_val, y_train, y_test, y_val = split_data(x_cleaned, y_raw, state=42)
+
+    print("Random Forest Classifier Results:")
+    # train a model
+    clf = train_model('random_forest', state=42, x_train=x_train, y_train=y_train)
+
+    # evaluate the model
+    train_acc = evaluate_model(clf, x_train, y_train)
+    val_acc = evaluate_model(clf, x_val, y_val)
+    test_acc = evaluate_model(clf, x_test, y_test)
+
+    print(f"Training Accuracy: {train_acc:.4f}")
+    print(f"Validation Accuracy: {val_acc:.4f}")
+    print(f"Test Accuracy: {test_acc:.4f}")
+    
+    print("Decision Tree Classifier results:")
+    # train a model
+    clf = train_model('decision_tree', state=42, x_train=x_train, y_train=y_train)
+
+    # evaluate the model
+    train_acc = evaluate_model(clf, x_train, y_train)
+    val_acc = evaluate_model(clf, x_val, y_val)
+    test_acc = evaluate_model(clf, x_test, y_test)
+
+    print(f"Training Accuracy: {train_acc:.4f}")
+    print(f"Validation Accuracy: {val_acc:.4f}")
+    print(f"Test Accuracy: {test_acc:.4f}")
+    
+    print("KNN Classifier Results:")
+    # train a model
+    clf = train_model('knn', state=42, x_train=x_train, y_train=y_train)
+
+    # evaluate the model
+    train_acc = evaluate_model(clf, x_train, y_train)
+    val_acc = evaluate_model(clf, x_val, y_val)
+    test_acc = evaluate_model(clf, x_test, y_test)
+
+    print(f"Training Accuracy: {train_acc:.4f}")
+    print(f"Validation Accuracy: {val_acc:.4f}")
+    print(f"Test Accuracy: {test_acc:.4f}")
+    
+    print("MLP Classifier Results:")
+    # train a model
+    clf = train_model('MLP', state=42, x_train=x_train, y_train=y_train)
+
+    # evaluate the model
+    train_acc = evaluate_model(clf, x_train, y_train)
+    val_acc = evaluate_model(clf, x_val, y_val)
+    test_acc = evaluate_model(clf, x_test, y_test)
+
+    print(f"Training Accuracy: {train_acc:.4f}")
+    print(f"Validation Accuracy: {val_acc:.4f}")
+    print(f"Test Accuracy: {test_acc:.4f}")
+    
+    print("SVM Classifier Results:")
+    # train a model
+    clf = train_model('SVM', state=42, x_train=x_train, y_train=y_train)
+
+    # evaluate the model
+    train_acc = evaluate_model(clf, x_train, y_train)
+    val_acc = evaluate_model(clf, x_val, y_val)
+    test_acc = evaluate_model(clf, x_test, y_test)
+
+    print(f"Training Accuracy: {train_acc:.4f}")
+    print(f"Validation Accuracy: {val_acc:.4f}")
+    print(f"Test Accuracy: {test_acc:.4f}")
+    
+
+
+    """ 
     coeffs, score, latent, tsquared, explained, mu, std = run_pca(x_cleaned, n_components=None).values()
     
     feature_names = x_cleaned.columns.tolist()
@@ -156,6 +231,6 @@ def main():
     plt.ylabel('Feature Value')
     plt.legend()
     plt.show()
-
+    """
 if __name__ == "__main__":
     main()
